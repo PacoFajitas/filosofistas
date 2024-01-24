@@ -6,7 +6,7 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 19:28:38 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/24 15:52:49 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/24 22:04:09 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,9 @@ typedef struct s_philo
 	int						philo;
 	int						times_eaten;
 	long					time_last_eat;
-	int						eating;
 	pthread_mutex_t			*left_fork;
 	pthread_mutex_t			right_fork;
-	pthread_mutex_t			mtx_dead;
+	pthread_mutex_t			mtx_eat;
 	struct s_data			*data;
 }	t_philo;
 
@@ -67,4 +66,5 @@ void	*ft_routine(void *arg);
 int		ft_init_philos(t_data *data);
 int		ft_init_data(t_data *data);
 int		ft_init_threads(t_data *data);
+void	ft_usleep(long long time);
 #endif
