@@ -6,24 +6,60 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/11 20:19:25 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/24 02:56:45 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/24 16:04:43 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/philosophers.h"
 
+void	ft_status(t_data *data)
+{
+	int	finished;
+	int	i;
+	int	p_last_meal;
+	int	full;
+
+	i = 0;
+	finished = 0;
+	p_last_meal = 0;
+	while(finished == 0)
+	{
+		if(data->lim_times_eaten != -1)
+		{
+			pthread_mutex_lock(&data->mtx_philo_full);
+			full = data->philos_full;
+			pthread_mutex_unlock(&data->mtx_philo_full);
+			if(full == data->total_philo)
+			{
+				pthread_mutex_lock(&data->mtx_finished);
+				data->finished = 1;
+				pthread_mutex_unlock(&data->mtx_finished);
+			}
+		}
+		
+		i ++;
+		if(i == data->total_philo)
+			i = 0;
+	}
+}
+
 void	ft_finish()
+{
+
+}
 
 void	ft_routine_single(t_philo *philo)
 {
-	pthread_mutex_lock(philo->left_fork);
-	ft_print_st("picked the left fork", philo);
+	pthread_mutex_lock(&philo->right_fork);
+	ft_print_st("picked the right fork", philo);
 	usleep(philo->data->time_to_die * 1000);
 	pthread_mutex_lock(&philo->mtx_dead);
 	ft_print_st("died", philo);
+	pthread_mutex_lock(&philo->data->mtx_finished);
 	philo->data->finished = 1;
+	pthread_mutex_unlock(&philo->data->mtx_finished);
 	pthread_mutex_unlock(&philo->mtx_dead);
-	pthread_mutex_unlock(philo->left_fork);
+	pthread_mutex_unlock(&philo->right_fork);
 }
 
 void	*ft_routine(void *arg)
@@ -33,6 +69,7 @@ void	*ft_routine(void *arg)
 	
 	philo = arg;
 	finished = 0;
+	
 	pthread_mutex_lock(&philo->data->mtx_synchro);
 	pthread_mutex_unlock(&philo->data->mtx_synchro);
 	if (philo->philo % 2 == 0)
@@ -81,6 +118,7 @@ int	ft_init_threads(t_data *data)
 	int	i;
 
 	i = 0;
+
 	while (i < data->total_philo)
 	{
 		if(pthread_create(&data->threads[i], NULL, &ft_routine, &(data)->philos[i]) !=0)
@@ -105,6 +143,7 @@ int	ft_init_data(t_data *data)
 	data->threads = malloc(sizeof(pthread_t) * data->total_philo);
 	if(!data->threads)
 		return(ft_error(2));
+	
 	if(!ft_init_philos(data))
 		return(0);
 	if(!ft_init_threads(data))
@@ -122,7 +161,7 @@ int	main(int argc, char **argv)
 		return(1);
 	data.time_start = ft_get_time();
 	pthread_mutex_unlock(&data.mtx_synchro);
-	ft_status();
+	ft_status(&data);
 	ft_finish();
 	return(0);
 }
