@@ -6,7 +6,7 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/24 02:05:38 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/24 22:05:11 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/29 04:11:31 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,20 @@ void	ft_print_st(char *str, t_philo *philo)
   		philo->data->finished = 1;
 	pthread_mutex_unlock(&philo->data->mtx_write);
 	pthread_mutex_unlock(&philo->data->mtx_finished);
+}
+int	ft_is_dead(t_philo philo)
+{
+	long	time_now;
+	long	time_diff;
+
+
+	time_now = ft_get_time() - philo.data->time_start;
+	pthread_mutex_lock(&philo.mtx_eat);
+	time_diff = time_now - philo.time_last_eat;
+	pthread_mutex_unlock(&philo.mtx_eat);
+	if(time_diff > philo.data->time_to_die)
+		return(1);
+	return(0);
 }
 
 long	ft_get_time(void)

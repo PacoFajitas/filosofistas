@@ -3,11 +3,11 @@ NAME = philo
 #########
 RM = rm -f
 CC = cc
-CFLAGS = -Werror -Wextra -Wall -g -fsanitize=address
+CFLAGS = -Werror -Wextra -Wall -g -fsanitize=thread
 #########
 
 #########
-FILES = philo args errors utils
+FILES = philo args errors utils routine
 
 SRC = $(addsuffix .c, $(FILES))
 
