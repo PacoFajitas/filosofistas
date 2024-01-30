@@ -6,7 +6,7 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 19:28:38 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/29 02:50:11 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/29 12:23:31 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ typedef struct s_data
 	t_philo	*philos;
 	long	time_start;
 	pthread_t	*threads;
-	pthread_mutex_t	mtx_synchro;
+	pthread_mutex_t	mtx_data;
 	pthread_mutex_t	mtx_write;
 	pthread_mutex_t	mtx_finished;
 	pthread_mutex_t	mtx_philo_full;
@@ -60,7 +60,7 @@ typedef struct s_data
 
 int		ft_check_args(int argc, char **argv, t_data *data);
 int		ft_error(int code);
-long	ft_get_time(void);
+long	ft_get_time(long time_start);
 void	ft_print_st(char *str, t_philo *philo);
 void	ft_routine_single(t_philo *philo);
 void	*ft_routine(void *arg);
@@ -69,5 +69,6 @@ int		ft_init_data(t_data *data);
 int		ft_init_threads(t_data *data);
 void	ft_usleep(long long time);
 int		ft_is_dead(t_philo philo);
-void	ft_routine_multiple(t_philo *philo);
+void	ft_routine_multiple(t_philo *philo, long time_eat, long time_sleep);
+void	ft_status(t_data *data);
 #endif

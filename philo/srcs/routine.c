@@ -6,37 +6,27 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/28 21:58:31 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/29 08:38:49 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/30 22:43:29 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/philosophers.h"
 
-void	ft_routine_multiple(t_philo *philo)
+void	ft_routine_multiple(t_philo *philo, long time_eat, long time_sleep)
 {
-	pthread_mutex_lock(philo->left_fork);
-	ft_print_st("picking the left fork", philo);
 	pthread_mutex_lock(&philo->right_fork);
-	ft_print_st("picking the right fork", philo);
+	ft_print_st("taking the right fork", philo);
+	pthread_mutex_lock(philo->left_fork);
+	ft_print_st("taking the left fork", philo);
 	pthread_mutex_lock(&philo->mtx_eat);
 	ft_print_st("eating", philo);
-	ft_usleep(philo->data->time_to_eat);
-	philo->time_last_eat = ft_get_time() - philo->data->time_start;
+	philo->time_last_eat = ft_get_time(philo->data->time_start) + time_eat;
 	pthread_mutex_unlock(&philo->mtx_eat);
-	if(philo->data->lim_times_eaten > 0)
-	{
-		philo->times_eaten++;
-		if(philo->times_eaten == philo->data->lim_times_eaten)
-		{
-			pthread_mutex_lock(&philo->data->mtx_philo_full);
-			philo->data->lim_times_eaten++;
-			pthread_mutex_unlock(&philo->data->mtx_philo_full);
-		}
-	}	
-	pthread_mutex_unlock(philo->left_fork);
+	ft_usleep(time_eat);
 	pthread_mutex_unlock(&philo->right_fork);
+	pthread_mutex_unlock(philo->left_fork);
 	ft_print_st("sleeping", philo);
-	ft_usleep(philo->data->time_to_sleep);
+	ft_usleep(time_sleep);
 	ft_print_st("thinking", philo);
 }
 void	*ft_routine(void *arg)
@@ -44,17 +34,20 @@ void	*ft_routine(void *arg)
 	t_philo *philo;
 	int		finished;
 	long	time_eat;
+	long	time_sleep;
 	
 	philo = arg;
 	finished = 0;
 	time_eat = 0;
-	pthread_mutex_lock(&philo->data->mtx_synchro);
-	pthread_mutex_unlock(&philo->data->mtx_synchro);
+	pthread_mutex_lock(&philo->data->mtx_data);
+	time_eat = philo->data->time_to_eat;
+	time_sleep = philo->data->time_to_sleep;
+	pthread_mutex_unlock(&philo->data->mtx_data);
 	if (philo->philo % 2 == 0)
-		usleep(philo->data->time_to_eat * 100);
+		ft_usleep(philo->data->time_to_eat/10);
 	while(finished == 0)
 	{
-		ft_routine_multiple(philo);
+		ft_routine_multiple(philo, time_eat, time_sleep);
 		pthread_mutex_lock(&philo->data->mtx_finished);
 		finished = philo->data->finished;
 		pthread_mutex_unlock(&philo->data->mtx_finished);
