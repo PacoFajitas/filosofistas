@@ -6,7 +6,7 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/11 20:19:25 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/30 22:20:52 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/31 19:54:15 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,10 @@ void	ft_status(t_data *data)
 		if (ft_get_time(data->time_start) - 
 			 tm_last_eat > data->time_to_die)
 		{
+			pthread_mutex_lock(&data->mtx_finished);
+			data->finished = 1;
+			pthread_mutex_unlock(&data->mtx_finished);
 			ft_print_st("dead", &data->philos[i]);
-			pthread_mutex_lock(&data->philos[i].data->mtx_finished);
-			data->philos[i].data->finished = 1;
-			pthread_mutex_unlock(&data->philos[i].data->mtx_finished);
 			break;
 		}
 		if(data->lim_times_eaten != -1)
@@ -53,9 +53,30 @@ void	ft_status(t_data *data)
 	}
 }
 
-void	ft_finish()
+void	ft_finish(t_data *data)
 {
+	int	i;
 
+	i = 0;
+	while(i < data->total_philo)
+	{
+		if(pthread_join(data->threads[i], NULL) != 0)
+			ft_error(3);
+		i++;
+	}
+	i = 0;
+	while (i < data->total_philo)
+	{
+		pthread_mutex_destroy(&data->philos[i].right_fork);
+		pthread_mutex_destroy(&data->philos[i].mtx_eat);
+		i++;
+	}
+	pthread_mutex_destroy(&data->mtx_data);
+	pthread_mutex_destroy(&data->mtx_write);
+	pthread_mutex_destroy(&data->mtx_finished);
+	pthread_mutex_destroy(&data->mtx_philo_full);
+	free(data->philos);
+	free(data->threads);
 }
 
 int	ft_init_philos(t_data *data)
@@ -98,10 +119,10 @@ int	ft_init_threads(t_data *data)
 
 int	ft_init_data(t_data *data)
 {
-	pthread_mutex_init(&data->mtx_philo_full, NULL);
-	pthread_mutex_init(&data->mtx_finished, NULL);
 	pthread_mutex_init(&data->mtx_data, NULL);
 	pthread_mutex_init(&data->mtx_write, NULL);
+	pthread_mutex_init(&data->mtx_finished, NULL);
+	pthread_mutex_init(&data->mtx_philo_full, NULL);
 	pthread_mutex_lock(&data->mtx_data);
 	data->philos_full = 0;
 	data->finished = 0;
@@ -129,6 +150,6 @@ int	main(int argc, char **argv)
 	data.time_start = ft_get_time(0);
 	pthread_mutex_unlock(&data.mtx_data);
 	ft_status(&data);
-	ft_finish();
+	ft_finish(&data);
 	return(0);
 }

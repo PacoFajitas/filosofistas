@@ -6,7 +6,7 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/28 21:58:31 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/30 22:43:29 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/31 19:28:14 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,13 @@ void	ft_routine_multiple(t_philo *philo, long time_eat, long time_sleep)
 	ft_print_st("taking the left fork", philo);
 	pthread_mutex_lock(&philo->mtx_eat);
 	ft_print_st("eating", philo);
+	philo->times_eaten++;
+	if (philo->times_eaten == philo->data->lim_times_eaten)
+	{
+		pthread_mutex_lock(&philo->data->mtx_philo_full);
+		philo->data->philos_full++;
+		pthread_mutex_unlock(&philo->data->mtx_philo_full);
+	}
 	philo->time_last_eat = ft_get_time(philo->data->time_start) + time_eat;
 	pthread_mutex_unlock(&philo->mtx_eat);
 	ft_usleep(time_eat);
@@ -29,6 +36,7 @@ void	ft_routine_multiple(t_philo *philo, long time_eat, long time_sleep)
 	ft_usleep(time_sleep);
 	ft_print_st("thinking", philo);
 }
+
 void	*ft_routine(void *arg)
 {
 	t_philo *philo;

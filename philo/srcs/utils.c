@@ -6,7 +6,7 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/24 02:05:38 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/30 22:20:00 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/31 19:09:44 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,13 @@ void	ft_print_st(char *str, t_philo *philo)
 	long	time;
 	int		finished;
 
+	pthread_mutex_lock(&philo->data->mtx_write);
+	printf("");
 	pthread_mutex_lock(&philo->data->mtx_finished);
 	finished = philo->data->finished;
 	pthread_mutex_unlock(&philo->data->mtx_finished);
-	pthread_mutex_lock(&philo->data->mtx_write);
 	time = ft_get_time(philo->data->time_start); 
-	if( finished == 0)
+	if( finished == 0 || ft_strcmp(str, "dead") == 0)
 		printf("%li:::Philo %i is %s\n", time, philo->philo, str);
 	pthread_mutex_unlock(&philo->data->mtx_write);
 }
