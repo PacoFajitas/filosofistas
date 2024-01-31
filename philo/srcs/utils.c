@@ -6,7 +6,7 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/24 02:05:38 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/31 19:09:44 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/31 20:52:44 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ void	ft_print_st(char *str, t_philo *philo)
 	int		finished;
 
 	pthread_mutex_lock(&philo->data->mtx_write);
-	printf("");
 	pthread_mutex_lock(&philo->data->mtx_finished);
 	finished = philo->data->finished;
 	pthread_mutex_unlock(&philo->data->mtx_finished);

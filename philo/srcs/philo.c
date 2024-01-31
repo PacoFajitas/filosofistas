@@ -6,7 +6,7 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/11 20:19:25 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/31 19:54:15 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/31 21:00:17 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 void	ft_status(t_data *data)
 {
 	int		i;
-	int		full;
 	long	tm_last_eat;
 
 	i = 0;
@@ -34,23 +33,29 @@ void	ft_status(t_data *data)
 			ft_print_st("dead", &data->philos[i]);
 			break;
 		}
-		if(data->lim_times_eaten != -1)
-		{
-			pthread_mutex_lock(&data->mtx_philo_full);
-			full = data->philos_full;
-			pthread_mutex_unlock(&data->mtx_philo_full);
-			if(full == data->total_philo)
-			{
-				pthread_mutex_lock(&data->mtx_finished);
-				data->finished = 1;
-				pthread_mutex_unlock(&data->mtx_finished);
-				break;
-			}
-		}
+		if(data->lim_times_eaten != -1 && ft_are_full(data))
+			break;
 		i++;
 		if(i == data->total_philo)
 			i = 0;
 	}
+}
+
+int	ft_are_full(t_data *data)
+{
+	int	full;
+
+	pthread_mutex_lock(&data->mtx_philo_full);
+	full = data->philos_full;
+	pthread_mutex_unlock(&data->mtx_philo_full);
+	if(full == data->total_philo)
+	{
+		pthread_mutex_lock(&data->mtx_finished);
+		data->finished = 1;
+		pthread_mutex_unlock(&data->mtx_finished);
+		return(1);
+	}
+	return(0);
 }
 
 void	ft_finish(t_data *data)
@@ -131,7 +136,10 @@ int	ft_init_data(t_data *data)
 		return (ft_error(2));
 	data->threads = malloc(sizeof(pthread_t) * data->total_philo);
 	if(!data->threads)
+	{
+		free(data->philos);
 		return(ft_error(2));
+	}
 	if(!ft_init_philos(data))
 		return(0);
 	if(!ft_init_threads(data))

@@ -6,7 +6,7 @@
 /*   By: tfiguero <tfiguero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 19:28:38 by tfiguero          #+#    #+#             */
-/*   Updated: 2024/01/29 12:23:31 by tfiguero         ###   ########.fr       */
+/*   Updated: 2024/01/31 20:38:02 by tfiguero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,4 +71,5 @@ void	ft_usleep(long long time);
 int		ft_is_dead(t_philo philo);
 void	ft_routine_multiple(t_philo *philo, long time_eat, long time_sleep);
 void	ft_status(t_data *data);
+int		ft_are_full(t_data *data);
 #endif
